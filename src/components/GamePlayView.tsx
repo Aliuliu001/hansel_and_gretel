@@ -260,104 +260,60 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
         onOpenTeacherSettings={onOpenTeacherSettings}
         soundEnabled={settings.soundEnabled}
         onToggleSound={() => onUpdateSettings({ soundEnabled: !settings.soundEnabled })}
+        hideTitle={currentScreen === 'TITLE'}
       />
 
       {/* Main Game Shell Viewport */}
       <main className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center p-2 sm:p-4">
         {/* ===================== TITLE SCREEN ===================== */}
         {currentScreen === 'TITLE' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-between p-4 sm:p-8 animate-fade-in">
+          <div className="relative w-full h-full flex flex-col items-center justify-between p-3 sm:p-6 animate-fade-in">
             <CandyHouseBackground />
 
-            {/* Title lockup */}
-            <div className="relative z-10 pt-4 flex flex-col items-center text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-950/80 border-2 border-amber-500/80 shadow-lg mb-2">
-                <span className="text-xl animate-spin">🍭</span>
-                <span className="text-xs font-black uppercase tracking-widest text-amber-300">
-                  Fairytale Escape Adventure
-                </span>
-                <span className="text-xl animate-spin">🍬</span>
+            {/* Compact title pill at the very top — never covers the house */}
+            <div className="relative z-10 pt-1 sm:pt-2">
+              <div className="inline-flex items-center gap-1.5 sm:gap-3 px-3 sm:px-6 py-1.5 sm:py-2 rounded-full bg-amber-950/85 border-2 border-amber-500/80 shadow-lg max-w-[94vw]">
+                <span className="text-lg sm:text-xl shrink-0">🍭</span>
+                <h1 className="font-['Lilita_One',sans-serif] text-sm sm:text-2xl tracking-wide text-amber-100 drop-shadow text-center leading-tight whitespace-nowrap">
+                  Hansel &amp; Gretel
+                  <span className="text-pink-300"> · Candy House Escape</span>
+                </h1>
+                <span className="text-lg sm:text-xl shrink-0">🍬</span>
               </div>
-
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-['Lilita_One',sans-serif] text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-200 to-amber-400 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] tracking-wide">
-                Hansel &amp; Gretel
-              </h1>
-              <p className="font-['Lilita_One',sans-serif] text-2xl sm:text-3xl text-pink-300 drop-shadow-[0_3px_3px_rgba(0,0,0,0.9)] tracking-wider -mt-1 sm:-mt-2">
-                Candy House Escape
-              </p>
-              <p className="text-xs sm:text-sm text-amber-100/90 font-medium max-w-md mt-2 bg-black/40 backdrop-blur-xs px-4 py-1 rounded-full border border-amber-600/40">
-                Enter the two secret codes to open the gate and set the children free!
-              </p>
             </div>
 
-            {/* Start buttons — what shows depends on the teacher's mode setting */}
-            <div className="relative z-10 w-full max-w-md flex flex-col gap-3.5 pb-6">
+            {/* Single-line rescue button at the bottom */}
+            <div className="relative z-10 w-full flex justify-center pb-6">
               {settings.modeSetting === 'BOTH' ? (
                 <>
-                  {/* NORMAL MODE BUTTON */}
                   <button
                     onClick={() => handleStartGame('NORMAL')}
-                    className="w-full py-4 px-6 rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-white font-['Lilita_One',sans-serif] text-2xl sm:text-3xl tracking-wide shadow-2xl border-b-6 border-amber-800 active:translate-y-1 transition-all cursor-pointer flex items-center justify-between group"
+                    className="w-fit px-7 sm:px-9 py-3 sm:py-3.5 rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-white font-['Lilita_One',sans-serif] text-lg sm:text-2xl tracking-wide shadow-2xl border-b-6 border-amber-800 active:translate-y-1 transition-all cursor-pointer flex items-center justify-center gap-2.5"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl group-hover:scale-125 transition-transform">🍭</span>
-                      <div className="text-left">
-                        <span className="block leading-tight">NORMAL MODE</span>
-                        <span className="block text-xs font-['Fredoka',sans-serif] text-amber-100/90 font-semibold">
-                          Wrong code? 3s lock, then try again
-                        </span>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-7 h-7 group-hover:translate-x-1.5 transition-transform" />
+                    <span>🎀 Rescue — Normal</span>
+                    <ArrowRight className="w-6 h-6" />
                   </button>
-
-                  {/* HARD MODE BUTTON */}
                   <button
                     onClick={() => handleStartGame('HARD')}
-                    className="w-full py-4 px-6 rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-600 hover:to-indigo-600 text-white font-['Lilita_One',sans-serif] text-2xl sm:text-3xl tracking-wide shadow-2xl border-b-6 border-purple-950 active:translate-y-1 transition-all cursor-pointer flex items-center justify-between group"
+                    className="w-fit px-7 sm:px-9 py-3 sm:py-3.5 rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-600 hover:to-indigo-600 text-white font-['Lilita_One',sans-serif] text-lg sm:text-2xl tracking-wide shadow-2xl border-b-6 border-purple-950 active:translate-y-1 transition-all cursor-pointer flex items-center justify-center gap-2.5"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl group-hover:scale-125 transition-transform">⚡</span>
-                      <div className="text-left">
-                        <span className="block leading-tight">HARD MODE</span>
-                        <span className="block text-xs font-['Fredoka',sans-serif] text-purple-200/90 font-semibold">
-                          3 wrong codes at the gate = back to the start!
-                        </span>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-7 h-7 group-hover:translate-x-1.5 transition-transform" />
+                    <span>⚡ Rescue — Hard</span>
+                    <ArrowRight className="w-6 h-6" />
                   </button>
                 </>
               ) : (
-                /* Single START button — teacher picked the mode in settings */
                 <button
                   onClick={() => handleStartGame(settings.modeSetting === 'HARD' ? 'HARD' : 'NORMAL')}
-                  className={`w-full py-5 px-6 rounded-3xl text-white font-['Lilita_One',sans-serif] text-3xl tracking-wide shadow-2xl active:translate-y-1 transition-all cursor-pointer flex items-center justify-between group ${
+                  className={`w-fit px-7 sm:px-9 py-3 sm:py-3.5 rounded-3xl text-white font-['Lilita_One',sans-serif] text-lg sm:text-2xl tracking-wide shadow-2xl active:translate-y-1 transition-all cursor-pointer flex items-center justify-center gap-2.5 ${
                     settings.modeSetting === 'HARD'
                       ? 'bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-600 hover:to-indigo-600 border-b-6 border-purple-950'
                       : 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 border-b-6 border-amber-800'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-4xl group-hover:scale-125 transition-transform">
-                      {settings.modeSetting === 'HARD' ? '⚡' : '🍭'}
-                    </span>
-                    <div className="text-left">
-                      <span className="block leading-tight">START GAME</span>
-                      <span className="block text-xs font-['Fredoka',sans-serif] opacity-90 font-semibold">
-                        {settings.modeSetting === 'HARD'
-                          ? 'Hard mode: 3 wrong codes at the gate = back to the start!'
-                          : 'Normal mode: wrong code? 3s lock, then try again'}
-                      </span>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-8 h-8 group-hover:translate-x-1.5 transition-transform" />
+                  <span>{settings.modeSetting === 'HARD' ? '⚡' : '🎀'} Rescue Hansel &amp; Gretel</span>
+                  <ArrowRight className="w-6 h-6" />
                 </button>
               )}
-
-              <p className="text-center text-xs text-amber-100 font-semibold bg-black/55 backdrop-blur-xs px-4 py-1 rounded-full border border-amber-700/50 mx-auto w-fit">
-                Tap the digits, then tap the green ✓ to check your code
-              </p>
             </div>
           </div>
         )}

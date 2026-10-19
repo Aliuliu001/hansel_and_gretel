@@ -460,13 +460,29 @@ export const IronGateNightBackground: React.FC<{
           </g>
         </g>
 
-        {/* Glowing Fireflies */}
-        <g fill="#fef08a" opacity="0.9" className="animate-sparks">
-          <circle cx="340" cy="380" r="4" filter="url(#moonGlow)" />
-          <circle cx="780" cy="360" r="5" filter="url(#moonGlow)" />
-          <circle cx="510" cy="520" r="3.5" filter="url(#moonGlow)" />
-          <circle cx="860" cy="480" r="4.5" filter="url(#moonGlow)" />
-          <circle cx="210" cy="540" r="3" filter="url(#moonGlow)" />
+        {/* Fireflies — slow lazy drift, scattered all across the night scene */}
+        <g fill="#fef08a">
+          {[
+            { x: 150, y: 240, r: 3.5, dur: '7s', delay: '0s' },
+            { x: 330, y: 430, r: 4, dur: '9s', delay: '1.5s' },
+            { x: 520, y: 250, r: 3, dur: '8s', delay: '3s' },
+            { x: 700, y: 500, r: 4.5, dur: '10s', delay: '0.8s' },
+            { x: 880, y: 270, r: 3.5, dur: '7.5s', delay: '2.2s' },
+            { x: 1060, y: 430, r: 4, dur: '9.5s', delay: '4s' },
+            { x: 620, y: 570, r: 3, dur: '8.5s', delay: '5s' },
+            { x: 240, y: 560, r: 3.5, dur: '11s', delay: '6s' },
+            { x: 980, y: 580, r: 3, dur: '9s', delay: '3.5s' }
+          ].map((f, i) => (
+            <circle
+              key={i}
+              cx={f.x}
+              cy={f.y}
+              r={f.r}
+              filter="url(#moonGlow)"
+              className="firefly"
+              style={{ animationDuration: f.dur, animationDelay: f.delay }}
+            />
+          ))}
         </g>
       </svg>
     </div>

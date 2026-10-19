@@ -9,6 +9,8 @@ interface GameHUDProps {
   onOpenTeacherSettings: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  /** Hide the left-side brand title (used on the title screen, which shows its own title pill) */
+  hideTitle?: boolean;
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({
@@ -17,16 +19,21 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   mode,
   onOpenTeacherSettings,
   soundEnabled,
-  onToggleSound
+  onToggleSound,
+  hideTitle = false
 }) => {
   return (
     <header className="relative z-40 w-full px-3 sm:px-4 py-2.5 bg-gradient-to-b from-black/80 via-black/50 to-transparent flex items-center justify-between gap-2 pointer-events-auto">
       {/* LEFT: Game Title */}
       <div className="flex items-center gap-2 min-w-0">
-        <span className="text-xl">🍭</span>
-        <span className="font-['Lilita_One',sans-serif] text-sm sm:text-base md:text-lg tracking-wide text-amber-200 drop-shadow truncate">
-          Candy House Escape
-        </span>
+        {!hideTitle && (
+          <>
+            <span className="text-xl">🍭</span>
+            <span className="font-['Lilita_One',sans-serif] text-sm sm:text-base md:text-lg tracking-wide text-amber-200 drop-shadow truncate">
+              Candy House Escape
+            </span>
+          </>
+        )}
       </div>
 
       {/* CENTER: THE TWO PADLOCK ICONS */}

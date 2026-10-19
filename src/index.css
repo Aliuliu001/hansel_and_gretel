@@ -81,6 +81,21 @@
     animation: swingRightOpen 1.4s cubic-bezier(.35,.7,.35,1) forwards;
   }
 
+  /* ---- Lazy drifting fireflies (Level 2 night scene) ---- */
+  @keyframes fireflyDrift {
+    0% { transform: translate(0, 0); opacity: 0.2; }
+    20% { opacity: 0.95; }
+    25% { transform: translate(14px, -22px); }
+    50% { transform: translate(-10px, -38px); opacity: 0.35; }
+    70% { opacity: 1; }
+    75% { transform: translate(-20px, -14px); }
+    100% { transform: translate(0, 0); opacity: 0.2; }
+  }
+
+  .firefly {
+    animation: fireflyDrift 8s ease-in-out infinite;
+  }
+
   /* ---- Win screen falling confetti ---- */
   @keyframes confettiFall {
     0% { transform: translateY(-12vh) rotate(0deg); opacity: 1; }
