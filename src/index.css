@@ -99,6 +99,36 @@
     animation: childrenEscapeRun 2.4s ease-in forwards;
   }
 
+  /* ---- Halloween bats fluttering out with the children ---- */
+  @keyframes batDriftL {
+    0% { transform: translate(0, 0); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translate(-130px, -100px); opacity: 0; }
+  }
+
+  @keyframes batDriftR {
+    0% { transform: translate(0, 0); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translate(130px, -100px); opacity: 0; }
+  }
+
+  @keyframes batFlap {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1.25, 0.75); }
+  }
+
+  .bat-drift-l {
+    animation: batDriftL 2.3s ease-out forwards;
+  }
+
+  .bat-drift-r {
+    animation: batDriftR 2.3s ease-out forwards;
+  }
+
+  .bat-flap {
+    animation: batFlap 0.45s ease-in-out infinite;
+  }
+
   /* ---- Lazy drifting fireflies (Level 2 night scene) ---- */
   @keyframes fireflyDrift {
     0% { transform: translate(0, 0); opacity: 0.2; }

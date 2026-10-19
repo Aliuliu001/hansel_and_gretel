@@ -322,14 +322,36 @@ export const IronGateNightBackground: React.FC<{
 
         {/* THE TWO CHILDREN: HANSEL & GRETEL BEHIND BARS */}
         <g id="children-behind-bars" className={childrenClass} transform="translate(460, 290)">
-          {/* Joy speed lines — only while the children are running free */}
+          {/* Halloween bats fluttering out with the escaping children */}
           {stage === 'children-run' && (
-            <g opacity="0.9">
-              <line x1="-60" y1="60" x2="-15" y2="60" stroke="#fef08a" strokeWidth="5" strokeLinecap="round" />
-              <line x1="-82" y1="95" x2="-27" y2="95" stroke="#fef08a" strokeWidth="4" strokeLinecap="round" />
-              <line x1="-55" y1="130" x2="-10" y2="130" stroke="#fef08a" strokeWidth="5" strokeLinecap="round" />
-              <line x1="250" y1="70" x2="295" y2="70" stroke="#fef08a" strokeWidth="5" strokeLinecap="round" />
-              <line x1="262" y1="110" x2="305" y2="110" stroke="#fef08a" strokeWidth="4" strokeLinecap="round" />
+            <g id="halloween-bats">
+              {[
+                { x: -150, y: 20, s: 1.3, dir: 'l', dur: '2.2s', delay: '0s' },
+                { x: -195, y: 115, s: 0.9, dir: 'l', dur: '2.4s', delay: '0.3s' },
+                { x: 335, y: 30, s: 1.2, dir: 'r', dur: '2.3s', delay: '0.15s' },
+                { x: 385, y: 125, s: 0.85, dir: 'r', dur: '2.5s', delay: '0.45s' }
+              ].map((b, i) => (
+                <g
+                  key={i}
+                  className={b.dir === 'l' ? 'bat-drift-l' : 'bat-drift-r'}
+                  style={{ animationDuration: b.dur, animationDelay: b.delay }}
+                >
+                  <g transform={`translate(${b.x},${b.y}) scale(${b.s})`}>
+                    <g className="bat-flap" style={{ transformOrigin: '16px 4px' }} fill="#3b3663" stroke="#1e1b4b" strokeWidth="0.8">
+                      {/* Wings */}
+                      <path d="M16,5 C13,0 8,-3 1,0 C5,2 6,6 3,10 C9,6 13,8 15,11 C15.4,8 16,7 16,5 Z" />
+                      <path d="M16,5 C19,0 24,-3 31,0 C27,2 26,6 29,10 C23,6 19,8 17,11 C16.6,8 16,7 16,5 Z" />
+                      {/* Body + ears */}
+                      <ellipse cx="16" cy="7" rx="3.2" ry="4.2" />
+                      <path d="M13.5,3.5 L14,0.2 L15.3,3.2 Z" />
+                      <path d="M16.7,3.2 L18,0.2 L18.5,3.5 Z" />
+                      {/* Glowing pumpkin-orange eyes */}
+                      <circle cx="14.7" cy="6" r="0.8" fill="#f97316" stroke="none" />
+                      <circle cx="17.3" cy="6" r="0.8" fill="#f97316" stroke="none" />
+                    </g>
+                  </g>
+                </g>
+              ))}
             </g>
           )}
 

@@ -61,6 +61,13 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
   // gate swings open -> children run out happily -> WIN
   const [gateStage, setGateStage] = useState<'accepted' | 'chain-fall' | 'open' | 'children-run'>('accepted');
 
+  // The two secret codes — EITHER code opens EITHER lock, whichever the
+  // team enters first opens lock 1; the other code then opens lock 2.
+  const [remainingCodes, setRemainingCodes] = useState<string[]>([
+    settings.level1Code,
+    settings.level2Code
+  ]);
+
   // Win stats
   const [startTime, setStartTime] = useState<number>(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
@@ -172,24 +179,27 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
 
     const isLevel1 = currentScreen === 'LEVEL1';
     const enteredCode = enteredDigits.join('');
-    const targetCode = isLevel1 ? settings.level1Code : settings.level2Code;
+    const matchedIdx = remainingCodes.indexOf(enteredCode);
     setEnteredDigits([]);
 
-    if (enteredCode === targetCode) {
-      // SUCCESS!
+    if (matchedIdx !== -1) {
+      // SUCCESS! Consume whichever secret code was entered
+      const newRemaining = remainingCodes.filter((_, i) => i !== matchedIdx);
+      setRemainingCodes(newRemaining);
       setConsecutiveFails(0);
       setLevel2Fails(0);
+      triggerSound(() => playSound.success());
 
-      if (isLevel1) {
-        triggerSound(() => playSound.success());
+      if (newRemaining.length === 0) {
+        // Both locks opened -> gate opening sequence -> WIN
         setUnlockedL1(true);
-        setCurrentScreen('CODE_ACCEPTED');
-      } else {
-        // Level 2 unlocked -> green check flash -> gate opening sequence -> WIN
-        triggerSound(() => playSound.success());
         setUnlockedL2(true);
         setGateStage('accepted');
         setCurrentScreen('GATE_OPEN');
+      } else {
+        // One code left -> the other lock awaits
+        setUnlockedL1(true);
+        setCurrentScreen('CODE_ACCEPTED');
       }
       return;
     }
@@ -219,6 +229,7 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
   };
 
   const resetRun = () => {
+    setRemainingCodes([settings.level1Code, settings.level2Code]);
     setEnteredDigits([]);
     setConsecutiveFails(0);
     setLevel2Fails(0);
@@ -238,7 +249,8 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
   };
 
   const handleHardModeResetConfirm = () => {
-    // Back to Level 1: both padlocks re-locked, must enter code 1 again
+    // Back to Level 1: both padlocks re-locked, both codes active again
+    setRemainingCodes([settings.level1Code, settings.level2Code]);
     setUnlockedL1(false);
     setUnlockedL2(false);
     setLevel2Fails(0);
@@ -330,7 +342,7 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
               <span className="text-base">🍬</span>
               <span className="font-bold">Level 1: Candy House Door</span>
               <span className="text-amber-400">·</span>
-              <span>Enter the 4-digit code to unlatch the door</span>
+              <span>Enter one of the two secret codes</span>
             </div>
 
             <CombinationLock
@@ -380,7 +392,7 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
               <span className="text-base">🌙</span>
               <span className="font-bold text-amber-300">Level 2: The Rusty Iron Gate</span>
               <span className="text-slate-400">·</span>
-              <span>Enter the 4-digit code to break the chain</span>
+              <span>Enter the other secret code to break the chain</span>
             </div>
 
             <CombinationLock
@@ -399,7 +411,7 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
           <div className="relative w-full h-full flex flex-col items-center justify-center p-4 animate-fade-in">
             <IronGateNightBackground stage={gateStage} />
 
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2">
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2">
               {gateStage === 'accepted' ? (
                 <div className="px-8 py-3 rounded-3xl bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 border-4 border-emerald-200 shadow-2xl text-white font-['Lilita_One',sans-serif] text-2xl sm:text-3xl tracking-wide animate-bounce flex items-center gap-2">
                   <span>✓</span>
