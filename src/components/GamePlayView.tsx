@@ -57,8 +57,9 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
   const [maxLockoutSeconds, setMaxLockoutSeconds] = useState<number>(3);
   const [afterLockout, setAfterLockout] = useState<AfterLockout>(null);
 
-  // Gate opening sequence stage: green "code accepted" flash -> chain falls -> gate swings open
-  const [gateStage, setGateStage] = useState<'accepted' | 'chain-fall' | 'open'>('accepted');
+  // Gate opening sequence stage: green "code accepted" flash -> chain falls ->
+  // gate swings open -> children run out happily -> WIN
+  const [gateStage, setGateStage] = useState<'accepted' | 'chain-fall' | 'open' | 'children-run'>('accepted');
 
   // Win stats
   const [startTime, setStartTime] = useState<number>(Date.now());
@@ -120,14 +121,16 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
       triggerSound(() => playSound.chainUnlock());
     }, 1400);
     const openTimer = setTimeout(() => setGateStage('open'), 2450);
+    const runTimer = setTimeout(() => setGateStage('children-run'), 4150);
     const winTimer = setTimeout(() => {
       triggerSound(() => playSound.victory());
       setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
       setCurrentScreen('WIN');
-    }, 4650);
+    }, 6800);
     return () => {
       clearTimeout(chainTimer);
       clearTimeout(openTimer);
+      clearTimeout(runTimer);
       clearTimeout(winTimer);
     };
   }, [currentScreen, startTime]);
@@ -404,11 +407,15 @@ export const GamePlayView: React.FC<GamePlayViewProps> = ({
                 </div>
               ) : (
                 <div className="px-8 py-3 rounded-3xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 border-4 border-yellow-200 shadow-2xl text-amber-950 font-['Lilita_One',sans-serif] text-2xl sm:text-3xl tracking-wide animate-bounce">
-                  {gateStage === 'chain-fall' ? '⛓️ The chain is falling...' : '🚪 The gate is opening!'}
+                  {gateStage === 'chain-fall'
+                    ? '⛓️ The chain is falling...'
+                    : gateStage === 'open'
+                    ? '🚪 The gate is opening!'
+                    : '🎉 Hansel & Gretel run free!'}
                 </div>
               )}
               <span className="text-sm font-bold text-amber-100 drop-shadow bg-black/50 px-4 py-1 rounded-full">
-                Hansel &amp; Gretel are about to run!
+                {gateStage === 'children-run' ? '🎉 Free at last!' : 'Hansel & Gretel are about to run!'}
               </span>
             </div>
           </div>

@@ -81,6 +81,24 @@
     animation: swingRightOpen 1.4s cubic-bezier(.35,.7,.35,1) forwards;
   }
 
+  /* ---- Children happily running out of the open gate ---- */
+  @keyframes childrenEscapeRun {
+    0%   { transform: translate(460px, 290px) scale(1); opacity: 1; }
+    8%   { transform: translate(460px, 282px) scale(1.14); }
+    16%  { transform: translate(460px, 294px) scale(1.3); }
+    24%  { transform: translate(460px, 280px) scale(1.5); }
+    32%  { transform: translate(460px, 295px) scale(1.7); }
+    45%  { transform: translate(460px, 278px) scale(1.95); }
+    60%  { transform: translate(460px, 296px) scale(2.25); }
+    75%  { transform: translate(460px, 276px) scale(2.55); }
+    90%  { transform: translate(460px, 298px) scale(2.85); opacity: 1; }
+    100% { transform: translate(460px, 302px) scale(3); opacity: 0; }
+  }
+
+  .children-escape {
+    animation: childrenEscapeRun 2.4s ease-in forwards;
+  }
+
   /* ---- Lazy drifting fireflies (Level 2 night scene) ---- */
   @keyframes fireflyDrift {
     0% { transform: translate(0, 0); opacity: 0.2; }

@@ -235,13 +235,15 @@ export const IronGateNightBackground: React.FC<{
   className?: string;
   dimmed?: boolean;
   /** 'accepted'/'closed' = chained shut, 'chain-fall' = chain drops to the ground,
-   *  'open' = both gate leaves swing aside, children revealed */
-  stage?: 'accepted' | 'closed' | 'chain-fall' | 'open';
+   *  'open' = both gate leaves swing aside, 'children-run' = kids happily run out */
+  stage?: 'accepted' | 'closed' | 'chain-fall' | 'open' | 'children-run';
 }> = ({ className = '', dimmed = false, stage = 'closed' }) => {
+  const gateOpen = stage === 'open' || stage === 'children-run';
   const chainClass =
-    stage === 'chain-fall' ? 'gate-chain-falling' : stage === 'open' ? 'gate-chain-fallen' : '';
-  const leftGateClass = stage === 'open' ? 'gate-left-opening' : '';
-  const rightGateClass = stage === 'open' ? 'gate-right-opening' : '';
+    stage === 'chain-fall' ? 'gate-chain-falling' : gateOpen ? 'gate-chain-fallen' : '';
+  const leftGateClass = gateOpen ? 'gate-left-opening' : '';
+  const rightGateClass = gateOpen ? 'gate-right-opening' : '';
+  const childrenClass = stage === 'children-run' ? 'children-escape' : '';
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-700 ${dimmed ? 'opacity-40 filter blur-xs' : 'opacity-100'} ${className}`}>
@@ -319,14 +321,31 @@ export const IronGateNightBackground: React.FC<{
         <ellipse cx="600" cy="620" rx="650" ry="120" fill="#090d16" />
 
         {/* THE TWO CHILDREN: HANSEL & GRETEL BEHIND BARS */}
-        <g id="children-behind-bars" transform="translate(460, 290)">
+        <g id="children-behind-bars" className={childrenClass} transform="translate(460, 290)">
+          {/* Joy speed lines — only while the children are running free */}
+          {stage === 'children-run' && (
+            <g opacity="0.9">
+              <line x1="-60" y1="60" x2="-15" y2="60" stroke="#fef08a" strokeWidth="5" strokeLinecap="round" />
+              <line x1="-82" y1="95" x2="-27" y2="95" stroke="#fef08a" strokeWidth="4" strokeLinecap="round" />
+              <line x1="-55" y1="130" x2="-10" y2="130" stroke="#fef08a" strokeWidth="5" strokeLinecap="round" />
+              <line x1="250" y1="70" x2="295" y2="70" stroke="#fef08a" strokeWidth="5" strokeLinecap="round" />
+              <line x1="262" y1="110" x2="305" y2="110" stroke="#fef08a" strokeWidth="4" strokeLinecap="round" />
+            </g>
+          )}
+
           {/* Subtle lantern glow on their faces */}
           <ellipse cx="140" cy="110" rx="140" ry="90" fill="#fbbf24" opacity="0.15" filter="url(#moonGlow)" />
 
-          {/* HANSEL (Left Boy) */}
+          {/* Hansel (Left Boy) */}
           <g id="hansel" transform="translate(40, 20)">
-            {/* Body / Shirt */}
-            <rect x="18" y="70" width="48" height="60" rx="8" fill="#0284c7" />
+          {/* Body / Shirt */}
+          <rect x="18" y="70" width="48" height="60" rx="8" fill="#0284c7" />
+          {/* Legs */}
+          <line x1="30" y1="128" x2="28" y2="152" stroke="#78350f" strokeWidth="9" strokeLinecap="round" />
+          <line x1="54" y1="128" x2="56" y2="152" stroke="#78350f" strokeWidth="9" strokeLinecap="round" />
+          {/* Shoes */}
+          <ellipse cx="26" cy="155" rx="9" ry="5" fill="#1e293b" />
+          <ellipse cx="58" cy="155" rx="9" ry="5" fill="#1e293b" />
             {/* Suspenders */}
             <rect x="24" y="70" width="6" height="60" fill="#78350f" />
             <rect x="54" y="70" width="6" height="60" fill="#78350f" />
@@ -367,6 +386,12 @@ export const IronGateNightBackground: React.FC<{
           <g id="gretel" transform="translate(150, 24)">
             {/* Dress */}
             <polygon points="42,70 12,130 72,130" fill="#e11d48" />
+            {/* Legs */}
+            <line x1="30" y1="128" x2="29" y2="148" stroke="#fed7aa" strokeWidth="6" strokeLinecap="round" />
+            <line x1="52" y1="128" x2="54" y2="148" stroke="#fed7aa" strokeWidth="6" strokeLinecap="round" />
+            {/* Shoes */}
+            <ellipse cx="28" cy="151" rx="7" ry="4" fill="#9f1239" />
+            <ellipse cx="56" cy="151" rx="7" ry="4" fill="#9f1239" />
             {/* White Apron */}
             <polygon points="42,75 24,130 60,130" fill="#f8fafc" />
 
