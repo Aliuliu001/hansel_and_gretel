@@ -1,0 +1,6 @@
+{
+  "name": "Hansel & Gretel: Candy House Escape",
+  "description": "Storybook cartoon puzzle escape game UI/UX flow board and playable experience with hand-painted fairytale illustration and warm candy aesthetics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@layer utilities {
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px) rotate(-1deg); }
+    20%, 40%, 60%, 80% { transform: translateX(8px) rotate(1deg); }
+  }
+
+  @keyframes sparkFlicker {
+    0%, 100% { opacity: 0.9; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.08) rotate(3deg); }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.8)); }
+    50% { filter: drop-shadow(0 0 24px rgba(74, 222, 128, 1)); }
+  }
+
+  @keyframes pulseRedGlow {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8)); }
+    50% { filter: drop-shadow(0 0 24px rgba(248, 113, 113, 1)); }
+  }
+
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .animate-shake {
+    animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  .animate-sparks {
+    animation: sparkFlicker 0.15s infinite alternate;
+  }
+
+  .animate-glow-green {
+    animation: pulseGlow 1.2s ease-in-out infinite;
+  }
+
+  .animate-glow-red {
+    animation: pulseRedGlow 0.8s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: floatSlow 3s ease-in-out infinite;
+  }
+
+  /* ---- Gate opening sequence (Level 2 correct code) ---- */
+  @keyframes chainFall {
+    0% { transform: translate(600px, 390px) rotate(0deg); opacity: 1; }
+    60% { opacity: 1; }
+    100% { transform: translate(615px, 645px) rotate(28deg); opacity: 0; }
+  }
+
+  .gate-chain-falling {
+    animation: chainFall 0.75s cubic-bezier(.45,.05,.9,.6) forwards;
+  }
+
+  .gate-chain-fallen {
+    transform: translate(615px, 645px) rotate(28deg);
+    opacity: 0;
+  }
+
+  @keyframes swingLeftOpen {
+    from { transform: translateX(0); }
+    to { transform: translateX(-560px); }
+  }
+
+  @keyframes swingRightOpen {
+    from { transform: translateX(0); }
+    to { transform: translateX(560px); }
+  }
+
+  .gate-left-opening {
+    animation: swingLeftOpen 1.4s cubic-bezier(.35,.7,.35,1) forwards;
+  }
+
+  .gate-right-opening {
+    animation: swingRightOpen 1.4s cubic-bezier(.35,.7,.35,1) forwards;
+  }
+
+  /* ---- Win screen falling confetti ---- */
+  @keyframes confettiFall {
+    0% { transform: translateY(-12vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0.85; }
+  }
+
+  .confetti-piece {
+    position: absolute;
+    top: 0;
+    width: 12px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+    pointer-events: none;
+  }
+}
+
+/* Custom candy scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #3b1b0b;
+}
+::-webkit-scrollbar-thumb {
+  background: #d97706;
+  border-radius: 9999px;
+  border: 2px solid #3b1b0b;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
