@@ -1,11 +1,11 @@
 import React from 'react';
 import { Lock, Unlock, Settings, Volume2, VolumeX } from 'lucide-react';
-import { GameMode } from '../types/game';
+import { DifficultyMode } from '../types/game';
 
 interface GameHUDProps {
   padlock1: 'closed' | 'open';
   padlock2: 'closed' | 'open';
-  mode: GameMode;
+  mode: DifficultyMode;
   onOpenTeacherSettings: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -90,7 +90,6 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
       {/* RIGHT: Mode badge, mute & teacher settings */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Mode Badge */}
         <span
           className={`hidden md:inline-flex px-2.5 py-1 rounded-full text-xs font-black tracking-wider uppercase shadow-sm ${
             mode === 'HARD'
@@ -101,7 +100,6 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           {mode} MODE
         </span>
 
-        {/* Sound Toggle */}
         <button
           onClick={onToggleSound}
           className="w-8 h-8 rounded-full bg-amber-950/70 hover:bg-amber-900 border border-amber-700/60 text-amber-200 flex items-center justify-center transition-all cursor-pointer shadow"
@@ -114,7 +112,6 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           )}
         </button>
 
-        {/* Teacher settings gear */}
         <button
           onClick={onOpenTeacherSettings}
           className="w-8 h-8 rounded-full bg-amber-950/70 hover:bg-amber-900 border border-amber-700/60 text-amber-300 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow hover:rotate-45"

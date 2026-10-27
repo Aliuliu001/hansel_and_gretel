@@ -105,7 +105,7 @@ export function loadSettings(): GameSettings {
       gameMode: parsed.gameMode || DEFAULT_SETTINGS.gameMode,
       totalRounds: Math.min(200, Math.max(1, Number(parsed.totalRounds) || validRounds.length)),
       rounds: validRounds.length > 0 ? validRounds : DEFAULT_SETTINGS.rounds,
-      difficultyMode: parsed.difficultyMode || parsed.modeSetting === 'HARD' ? 'HARD' : 'NORMAL',
+      difficultyMode: parsed.difficultyMode === 'HARD' || parsed.modeSetting === 'HARD' ? 'HARD' : 'NORMAL',
       modeSetting: parsed.modeSetting || DEFAULT_SETTINGS.modeSetting,
       normalPenaltySeconds: parsed.normalPenaltySeconds ?? DEFAULT_SETTINGS.normalPenaltySeconds,
       fiveWrongPenaltySeconds: parsed.fiveWrongPenaltySeconds ?? DEFAULT_SETTINGS.fiveWrongPenaltySeconds,
