@@ -7,7 +7,7 @@
 - [x] Update `TeacherSettingsModal.tsx` with mode selection, round count, and clear paste instructions.
 - [x] Update `CombinationLock.tsx` for 1–10 flexible digits.
 - [x] Update `GamePlayView.tsx` for multi-round math/English solver engine.
-- [ ] Build & deploy to GitHub Pages.
+- [x] Build & deploy to GitHub Pages.
 
 ## Bug / Issue Log
 - None currently. (Fixed previous state-filtering bug by replacing with explicit round index tracking).
