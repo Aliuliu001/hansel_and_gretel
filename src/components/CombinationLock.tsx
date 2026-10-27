@@ -14,7 +14,7 @@ interface CombinationLockProps {
   lockoutSecondsRemaining?: number;
   maxLockoutSeconds?: number;
   lockTitle?: string;
-  isLevel2?: boolean;
+  displayQuestion?: string;
 }
 
 export const CombinationLock: React.FC<CombinationLockProps> = ({
@@ -28,21 +28,28 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
   isLockedOut = false,
   lockoutSecondsRemaining = 0,
   maxLockoutSeconds = 3,
-  lockTitle = 'WOODEN COMBINATION LOCK',
-  isLevel2 = false
+  lockTitle = 'COMBINATION LOCK',
+  displayQuestion = ''
 }) => {
-  // Pad digits array up to 4
+  // Dynamic grid columns based on maxDigits
+  const gridCols = maxDigits <= 4 ? 'grid-cols-4' : maxDigits <= 6 ? 'grid-cols-6' : maxDigits <= 8 ? 'grid-cols-8' : 'grid-cols-10';
+  
+  // Pad digits array to maxDigits
   const slots = Array.from({ length: maxDigits }).map((_, idx) => currentDigits[idx] || '');
 
-  // Calculate lockout progress ring
-  const strokeDashoffset = maxLockoutSeconds > 0
-    ? 283 - (283 * (maxLockoutSeconds - lockoutSecondsRemaining)) / maxLockoutSeconds
-    : 0;
-
   return (
-    <div className="relative flex flex-col items-center justify-center max-w-sm w-full mx-auto select-none">
+    <div className="relative flex flex-col items-center justify-center max-w-2xl w-full mx-auto select-none">
       {/* Sparks Overlay if error */}
       {isError && <SparksOverlay />}
+
+      {/* Display Question (for Math/English modes) */}
+      {displayQuestion && (
+        <div className="mb-4 px-6 py-3 rounded-2xl bg-amber-900/90 border-2 border-amber-500 shadow-lg max-w-full">
+          <p className="text-center text-amber-100 font-bold text-lg sm:text-xl break-words">
+            {displayQuestion}
+          </p>
+        </div>
+      )}
 
       {/* Lock Shackle (top of padlock) */}
       <div className="relative -mb-3 z-0 flex justify-center">
@@ -52,8 +59,6 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
               ? 'border-emerald-400 translate-x-4 -translate-y-4 rotate-12 drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]'
               : isError
               ? 'border-red-600 animate-pulse'
-              : isLevel2
-              ? 'border-slate-500'
               : 'border-amber-700'
           }`}
         />
@@ -66,8 +71,6 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
             ? 'bg-gradient-to-b from-emerald-800 to-emerald-950 border-emerald-400 animate-glow-green'
             : isError
             ? 'bg-gradient-to-b from-red-900 to-amber-950 border-red-500 animate-glow-red animate-shake'
-            : isLevel2
-            ? 'bg-gradient-to-b from-slate-800 via-slate-900 to-zinc-950 border-slate-600'
             : 'bg-gradient-to-b from-amber-800 via-amber-900 to-amber-950 border-amber-600'
         }`}
       >
@@ -105,14 +108,14 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
           )}
         </div>
 
-        {/* 4 DIGIT SLOTS */}
-        <div className="grid grid-cols-4 gap-2.5 mb-4 p-2.5 bg-black/40 rounded-2xl border-2 border-black/30 shadow-inner">
+        {/* DIGIT SLOTS (flexible 1-10) */}
+        <div className={`grid ${gridCols} gap-1.5 sm:gap-2 mb-4 p-2 sm:p-2.5 bg-black/40 rounded-2xl border-2 border-black/30 shadow-inner`}>
           {slots.map((digit, index) => {
             const hasValue = digit !== '';
             return (
               <div
                 key={index}
-                className={`relative h-18 rounded-xl flex items-center justify-center font-['Lilita_One',sans-serif] text-4xl shadow-inner transition-all duration-200 ${
+                className={`relative h-14 sm:h-16 rounded-lg sm:rounded-xl flex items-center justify-center font-['Lilita_One',sans-serif] text-2xl sm:text-3xl shadow-inner transition-all duration-200 ${
                   isSuccess
                     ? 'bg-emerald-900/90 text-emerald-200 border-2 border-emerald-400 animate-bounce'
                     : isError
@@ -125,12 +128,12 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
                 {hasValue ? (
                   <span>{digit}</span>
                 ) : (
-                  <span className="text-lg opacity-30 select-none">•</span>
+                  <span className="text-base sm:text-lg opacity-30 select-none">•</span>
                 )}
 
                 {/* Tumbler tick marks */}
-                <div className="absolute top-1 left-2 right-2 h-0.5 bg-white/20 rounded-full" />
-                <div className="absolute bottom-1 left-2 right-2 h-0.5 bg-black/20 rounded-full" />
+                <div className="absolute top-1 left-1 right-1 h-0.5 bg-white/20 rounded-full" />
+                <div className="absolute bottom-1 left-1 right-1 h-0.5 bg-black/20 rounded-full" />
               </div>
             );
           })}
@@ -191,7 +194,7 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
                 type="button"
                 onClick={() => onDigitPress(digit)}
                 disabled={isLockedOut || isSuccess || currentDigits.length >= maxDigits}
-                className="h-13 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:from-amber-600 active:to-amber-700 active:translate-y-1 text-white font-['Lilita_One',sans-serif] text-2xl shadow-md border-b-4 border-amber-800 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-12 sm:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:from-amber-600 active:to-amber-700 active:translate-y-1 text-white font-['Lilita_One',sans-serif] text-xl sm:text-2xl shadow-md border-b-4 border-amber-800 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {digit}
               </button>
@@ -202,10 +205,10 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
               type="button"
               onClick={onDeletePress}
               disabled={isLockedOut || isSuccess || currentDigits.length === 0}
-              className="h-13 rounded-2xl bg-gradient-to-b from-rose-500 to-rose-700 hover:from-rose-400 hover:to-rose-600 active:translate-y-1 text-white font-bold shadow-md border-b-4 border-rose-900 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-12 sm:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-b from-rose-500 to-rose-700 hover:from-rose-400 hover:to-rose-600 active:translate-y-1 text-white font-bold shadow-md border-b-4 border-rose-900 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               title="Backspace"
             >
-              <Delete className="w-6 h-6" />
+              <Delete className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
             {/* Zero button */}
@@ -213,7 +216,7 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
               type="button"
               onClick={() => onDigitPress('0')}
               disabled={isLockedOut || isSuccess || currentDigits.length >= maxDigits}
-              className="h-13 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:translate-y-1 text-white font-['Lilita_One',sans-serif] text-2xl shadow-md border-b-4 border-amber-800 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-12 sm:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:translate-y-1 text-white font-['Lilita_One',sans-serif] text-xl sm:text-2xl shadow-md border-b-4 border-amber-800 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               0
             </button>
@@ -223,14 +226,14 @@ export const CombinationLock: React.FC<CombinationLockProps> = ({
               type="button"
               onClick={onSubmitPress}
               disabled={isLockedOut || isSuccess || currentDigits.length < maxDigits}
-              className={`h-13 rounded-2xl font-['Lilita_One',sans-serif] text-lg font-bold shadow-md border-b-4 flex items-center justify-center gap-1 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:translate-y-1 ${
+              className={`h-12 sm:h-13 rounded-xl sm:rounded-2xl font-['Lilita_One',sans-serif] text-base sm:text-lg font-bold shadow-md border-b-4 flex items-center justify-center gap-1 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:translate-y-1 ${
                 currentDigits.length === maxDigits
                   ? 'bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white border-emerald-900 animate-pulse'
                   : 'bg-gradient-to-b from-slate-600 to-slate-700 text-slate-300 border-slate-900'
               }`}
               title="Submit code"
             >
-              <Check className="w-6 h-6 stroke-[3]" />
+              <Check className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3]" />
             </button>
           </div>
         </div>

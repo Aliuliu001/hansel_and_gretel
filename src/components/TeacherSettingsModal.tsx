@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, Settings, Key, Volume2, RotateCcw, Check, Gamepad2 } from 'lucide-react';
-import { GameSettings, ModeSetting, DEFAULT_SETTINGS } from '../types/game';
+import { X, Settings, Volume2, RotateCcw, Check, Gamepad2, ListOrdered, BookOpen } from 'lucide-react';
+import { GameSettings, GameMode, ModeSetting, DifficultyMode, DEFAULT_SETTINGS, parseTeacherPaste } from '../types/game';
 
 interface TeacherSettingsModalProps {
   isOpen: boolean;
@@ -9,10 +9,15 @@ interface TeacherSettingsModalProps {
   onSaveSettings: (settings: GameSettings) => void;
 }
 
-const MODE_OPTIONS: { value: ModeSetting; label: string; hint: string; emoji: string }[] = [
-  { value: 'NORMAL', label: 'Normal (default)', hint: 'Wrong code? 3s lock, then try again', emoji: '🍭' },
-  { value: 'HARD', label: 'Hard', hint: '3 wrong codes at the gate = back to start', emoji: '⚡' },
-  { value: 'BOTH', label: 'Players choose', hint: 'Show both buttons on the start screen', emoji: '🎯' }
+const GAME_MODE_OPTIONS: { value: GameMode; label: string; hint: string; emoji: string }[] = [
+  { value: 'CLASSIC', label: 'Classic Numbers', hint: 'Students enter passcode digits directly', emoji: '🔢' },
+  { value: 'MATH', label: 'Math Solver', hint: 'Display equations like "68 - 24 = ?"', emoji: '➕' },
+  { value: 'MATH_EN', label: 'Math in English', hint: 'Word problems: "Twenty plus five equals ?"', emoji: '🔤' }
+];
+
+const DIFFICULTY_OPTIONS: { value: DifficultyMode; label: string; hint: string; emoji: string }[] = [
+  { value: 'NORMAL', label: 'Normal', hint: 'Wrong code? 3s lock, then try again', emoji: '🍭' },
+  { value: 'HARD', label: 'Hard', hint: '3 wrong codes = back to start', emoji: '⚡' }
 ];
 
 export const TeacherSettingsModal: React.FC<TeacherSettingsModalProps> = ({
@@ -21,27 +26,45 @@ export const TeacherSettingsModal: React.FC<TeacherSettingsModalProps> = ({
   settings,
   onSaveSettings
 }) => {
-  const [level1Code, setLevel1Code] = useState(settings.level1Code);
-  const [level2Code, setLevel2Code] = useState(settings.level2Code);
-  const [modeSetting, setModeSetting] = useState<ModeSetting>(settings.modeSetting);
+  const [gameMode, setGameMode] = useState<GameMode>(settings.gameMode);
+  const [totalRounds, setTotalRounds] = useState<number>(settings.totalRounds);
+  const [pasteText, setPasteText] = useState<string>('');
+  const [difficultyMode, setDifficultyMode] = useState<DifficultyMode>(settings.difficultyMode);
   const [soundEnabled, setSoundEnabled] = useState(settings.soundEnabled);
   const [savedNotice, setSavedNotice] = useState(false);
+  const [parseError, setParseError] = useState<string>('');
 
   if (!isOpen) return null;
 
-  const codesReady = level1Code.length === 4 && level2Code.length === 4;
-
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!codesReady) return;
+    
+    // Parse pasted data if provided
+    let rounds = settings.rounds;
+    if (pasteText.trim()) {
+      const parsed = parseTeacherPaste(pasteText, gameMode);
+      if (parsed.length === 0) {
+        setParseError('Could not parse the pasted data. Please check the format.');
+        return;
+      }
+      rounds = parsed;
+      setParseError('');
+    }
+
+    // Validate total rounds
+    const validTotalRounds = Math.min(200, Math.max(1, totalRounds));
+
     onSaveSettings({
-      level1Code,
-      level2Code,
-      modeSetting,
-      soundEnabled,
+      gameMode,
+      totalRounds: validTotalRounds,
+      rounds,
+      difficultyMode,
+      modeSetting: difficultyMode, // Simplified: use difficulty as mode setting
       normalPenaltySeconds: settings.normalPenaltySeconds,
-      fiveWrongPenaltySeconds: settings.fiveWrongPenaltySeconds
+      fiveWrongPenaltySeconds: settings.fiveWrongPenaltySeconds,
+      soundEnabled
     });
+
     setSavedNotice(true);
     setTimeout(() => {
       setSavedNotice(false);
@@ -50,15 +73,17 @@ export const TeacherSettingsModal: React.FC<TeacherSettingsModalProps> = ({
   };
 
   const handleResetDefaults = () => {
-    setLevel1Code(DEFAULT_SETTINGS.level1Code);
-    setLevel2Code(DEFAULT_SETTINGS.level2Code);
-    setModeSetting(DEFAULT_SETTINGS.modeSetting);
+    setGameMode(DEFAULT_SETTINGS.gameMode);
+    setTotalRounds(DEFAULT_SETTINGS.totalRounds);
+    setPasteText('');
+    setDifficultyMode(DEFAULT_SETTINGS.difficultyMode);
     setSoundEnabled(DEFAULT_SETTINGS.soundEnabled);
+    setParseError('');
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-fade-in">
-      <div className="relative w-full max-w-md bg-gradient-to-b from-amber-900 via-amber-950 to-stone-950 border-4 border-amber-600 rounded-3xl p-6 shadow-2xl text-amber-50 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-gradient-to-b from-amber-900 via-amber-950 to-stone-950 border-4 border-amber-600 rounded-3xl p-6 shadow-2xl text-amber-50 max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -77,81 +102,131 @@ export const TeacherSettingsModal: React.FC<TeacherSettingsModalProps> = ({
               Teacher Settings
             </h2>
             <p className="text-xs text-amber-300/80">
-              Change the secret codes and the game mode. Saved on this device.
+              Configure game mode, rounds, and paste your custom questions. Saved on this device.
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSave} className="space-y-4 text-sm">
-          {/* Secret Codes */}
-          <div className="bg-amber-950/70 p-3.5 rounded-2xl border border-amber-800/80">
-            <div className="flex items-center gap-2 mb-2 font-bold text-amber-300">
-              <Key className="w-4 h-4 text-amber-400" />
-              <span>Secret Codes (4 digits each)</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-amber-200/90 mb-1">
-                  Code 1 — Candy House
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={4}
-                  value={level1Code}
-                  onChange={(e) => setLevel1Code(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="w-full bg-amber-900/80 border border-amber-600 rounded-xl px-3 py-1.5 font-['Lilita_One',sans-serif] text-xl tracking-widest text-amber-100 text-center focus:outline-none focus:ring-2 focus:ring-amber-400"
-                />
-                <span className="text-[10px] text-amber-400/80 mt-0.5 block">
-                  Default: {DEFAULT_SETTINGS.level1Code}
-                </span>
-              </div>
-              <div>
-                <label className="block text-xs text-amber-200/90 mb-1">
-                  Code 2 — Iron Gate
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={4}
-                  value={level2Code}
-                  onChange={(e) => setLevel2Code(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="w-full bg-amber-900/80 border border-amber-600 rounded-xl px-3 py-1.5 font-['Lilita_One',sans-serif] text-xl tracking-widest text-amber-100 text-center focus:outline-none focus:ring-2 focus:ring-amber-400"
-                />
-                <span className="text-[10px] text-amber-400/80 mt-0.5 block">
-                  Default: {DEFAULT_SETTINGS.level2Code}
-                </span>
-              </div>
-            </div>
-            {!codesReady && (
-              <p className="text-[11px] text-red-300 mt-2 font-bold">
-                Each code needs exactly 4 digits.
-              </p>
-            )}
-          </div>
-
-          {/* Game Mode */}
+          {/* Game Mode Selection */}
           <div className="bg-amber-950/70 p-3.5 rounded-2xl border border-amber-800/80">
             <div className="flex items-center gap-2 mb-2 font-bold text-amber-300">
               <Gamepad2 className="w-4 h-4 text-amber-400" />
               <span>Game Mode</span>
             </div>
             <div className="space-y-2">
-              {MODE_OPTIONS.map((opt) => (
+              {GAME_MODE_OPTIONS.map((opt) => (
                 <label
                   key={opt.value}
                   className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
-                    modeSetting === opt.value
+                    gameMode === opt.value
                       ? 'bg-amber-700/70 border-amber-400 shadow'
                       : 'bg-amber-900/50 border-amber-800/70 hover:bg-amber-800/60'
                   }`}
                 >
                   <input
                     type="radio"
-                    name="modeSetting"
+                    name="gameMode"
                     value={opt.value}
-                    checked={modeSetting === opt.value}
-                    onChange={() => setModeSetting(opt.value)}
+                    checked={gameMode === opt.value}
+                    onChange={() => setGameMode(opt.value)}
+                    className="w-4 h-4 accent-amber-500"
+                  />
+                  <span className="text-lg">{opt.emoji}</span>
+                  <span className="flex-1">
+                    <span className="block text-xs font-bold text-amber-100">{opt.label}</span>
+                    <span className="block text-[10px] text-amber-300/80">{opt.hint}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Total Rounds */}
+          <div className="bg-amber-950/70 p-3.5 rounded-2xl border border-amber-800/80">
+            <div className="flex items-center gap-2 mb-2 font-bold text-amber-300">
+              <ListOrdered className="w-4 h-4 text-amber-400" />
+              <span>Total Rounds (1-200)</span>
+            </div>
+            <input
+              type="number"
+              min="1"
+              max="200"
+              value={totalRounds}
+              onChange={(e) => setTotalRounds(Number(e.target.value))}
+              className="w-full bg-amber-900/80 border border-amber-600 rounded-xl px-3 py-2 font-['Lilita_One',sans-serif] text-xl text-amber-100 text-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+            />
+            <span className="text-[10px] text-amber-400/80 mt-1 block">
+              Default: {DEFAULT_SETTINGS.totalRounds} rounds. Set how many challenges students must solve.
+            </span>
+          </div>
+
+          {/* Paste Area with Instructions */}
+          <div className="bg-amber-950/70 p-3.5 rounded-2xl border border-amber-800/80">
+            <div className="flex items-center gap-2 mb-2 font-bold text-amber-300">
+              <BookOpen className="w-4 h-4 text-amber-400" />
+              <span>Paste Your Questions & Answers</span>
+            </div>
+            
+            {/* Format Guide */}
+            <div className="mb-3 p-2.5 bg-amber-900/50 rounded-xl border border-amber-700/50 text-[11px] text-amber-200/90 space-y-1">
+              <p className="font-bold text-amber-300">📝 Format Guide (one per line):</p>
+              <p><strong>Classic:</strong> Just the answer digits: <code className="bg-black/30 px-1 rounded">2301</code></p>
+              <p><strong>Math:</strong> Equation = Answer: <code className="bg-black/30 px-1 rounded">68 - 24 = 42</code></p>
+              <p><strong>English:</strong> Word problem answer: <code className="bg-black/30 px-1 rounded">Twenty plus five equals ? 25</code></p>
+              <p className="text-amber-400/90 mt-1">💡 Answers can be 1-10 digits long. The lock adjusts automatically!</p>
+            </div>
+
+            <textarea
+              value={pasteText}
+              onChange={(e) => {
+                setPasteText(e.target.value);
+                setParseError('');
+              }}
+              placeholder={
+                gameMode === 'CLASSIC' 
+                  ? '2301\n2906\n12345'
+                  : gameMode === 'MATH'
+                  ? '68 - 24 = 42\n15 + 30 = 45\n100 / 4 = 25'
+                  : 'Twenty plus five equals ? 25\nSixty minus ten = 50\nThree times eight ? 24'
+              }
+              rows={6}
+              className="w-full bg-amber-900/80 border border-amber-600 rounded-xl px-3 py-2 text-sm text-amber-100 font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+            />
+            
+            {parseError && (
+              <p className="text-[11px] text-red-300 mt-2 font-bold flex items-center gap-1">
+                <X className="w-3 h-3" /> {parseError}
+              </p>
+            )}
+            
+            <span className="text-[10px] text-amber-400/80 mt-2 block">
+              Leave empty to keep existing {settings.rounds.length} round(s). Paste new data to replace them.
+            </span>
+          </div>
+
+          {/* Difficulty Mode */}
+          <div className="bg-amber-950/70 p-3.5 rounded-2xl border border-amber-800/80">
+            <div className="flex items-center gap-2 mb-2 font-bold text-amber-300">
+              <Gamepad2 className="w-4 h-4 text-amber-400" />
+              <span>Difficulty</span>
+            </div>
+            <div className="space-y-2">
+              {DIFFICULTY_OPTIONS.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                    difficultyMode === opt.value
+                      ? 'bg-amber-700/70 border-amber-400 shadow'
+                      : 'bg-amber-900/50 border-amber-800/70 hover:bg-amber-800/60'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="difficultyMode"
+                    value={opt.value}
+                    checked={difficultyMode === opt.value}
+                    onChange={() => setDifficultyMode(opt.value)}
                     className="w-4 h-4 accent-amber-500"
                   />
                   <span className="text-lg">{opt.emoji}</span>
@@ -188,8 +263,7 @@ export const TeacherSettingsModal: React.FC<TeacherSettingsModalProps> = ({
 
             <button
               type="submit"
-              disabled={!codesReady}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-['Lilita_One',sans-serif] tracking-wide text-base shadow-lg border-b-2 border-emerald-900 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-['Lilita_One',sans-serif] tracking-wide text-base shadow-lg border-b-2 border-emerald-900 flex items-center gap-1.5 cursor-pointer"
             >
               {savedNotice ? <Check className="w-4 h-4" /> : null}
               {savedNotice ? 'Saved!' : 'Save Settings'}
